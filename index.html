@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="./css/style.css">
+        <title>Weather</title>
+    </head>
+    <body>
+       <div class="card">
+          <div class="search">
+            <input type="text" placeholder="Enter city name">
+            <button><img src="./image/search.png" class="search_icon"></button>
+          </div>
+          <div class="weather">
+            <img src="./image/rb_984.png" class="weather_icon" id="weather-icon"> <!-- Updated image element -->
+            <h1 class="temp">22°C</h1>
+            <h2 class="city">New York</h2>
+            <div class="detail">
+                <div class="col">
+                    <p class="humidity">25%</p>
+                    <p>Humidity</p>
+                </div>
+                <div class="col">
+                    <p class="wind">15km/h</p>
+                    <p>Wind Speed</p>
+                </div>
+            </div>
+          </div>
+       </div>
+        
+        <script>
+            const apiKey = "8bdc7c6ddb21314a404b5e83cd66df37";
+            const apiUrl = "https://api.openweathermap.org/data/2.5/weather?&units=metric&q=";
+            
+            const searchBtn = document.querySelector(".search button");
+            const searchInput = document.querySelector(".search input");
+
+            // Elements to update the UI
+            const cityDisplay = document.querySelector(".city");
+            const tempDisplay = document.querySelector(".temp");
+            const humidityDisplay = document.querySelector(".humidity");
+            const windDisplay = document.querySelector(".wind");
+            const weatherIcon = document.querySelector("#weather-icon"); // Select the weather icon element
+
+            searchBtn.addEventListener("click", () => {
+                const city = searchInput.value;
+                if (city) {
+                    checkWeather(city);  // Pass the city to the function
+                } else {
+                    alert("Please enter a city name");
+                }
+            });
+
+            async function checkWeather(city) {
+                try {
+                    const response = await fetch(`${apiUrl}${city}&appid=${apiKey}`);
+                    if (!response.ok) {
+                        throw new Error("City not found");
+                    }
+                    const data = await response.json();
+                    console.log(data);
+
+                    // Update the UI with fetched data
+                    cityDisplay.textContent = data.name;
+                    tempDisplay.textContent = `${data.main.temp}°C`;
+                    humidityDisplay.textContent = `${data.main.humidity}%`;
+                    windDisplay.textContent = `${data.wind.speed} km/h`;
+
+                    // Dynamically change the weather icon based on weather condition
+                    updateWeatherIcon(data.weather[0].main);
+
+                } catch (error) {
+                    console.error("Error fetching weather data: ", error.message);
+                    alert("Failed to fetch data. Please try again.");
+                }
+            }
+
+            // Function to update the weather icon
+            function updateWeatherIcon(weatherCondition) {
+                let iconSrc = "./image/rb_984.png";  // Default image
+
+                // Check the weather condition and change the icon accordingly
+                if (weatherCondition === "Clear") {
+                    iconSrc = "./image/sunny.png"; // sunny icon
+                } else if (weatherCondition === "Rain") {
+                    iconSrc = "./image/rain.png"; // rainy icon
+                } else if (weatherCondition === "Snow") {
+                    iconSrc = "./image/snow.png"; // snowy icon
+                } else if (weatherCondition === "Clouds") {
+                    iconSrc = "./image/cloud.png"; // cloudy icon
+                } else if (weatherCondition === "Thunderstorm") {
+                    iconSrc = "./image/cloud.png"; // thunderstorm icon
+                }
+
+                // Update the weather icon on the page
+                weatherIcon.src = iconSrc;
+            }
+        </script>
+    </body>
+</html>
